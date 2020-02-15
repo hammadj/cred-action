@@ -73,7 +73,7 @@ print(data[0]["head"]["ref"])')
 }
 
 
-main () {
+main() {
     make_curl_config
 
     # path to file that contains the POST response of the event
@@ -101,6 +101,6 @@ main () {
 
 echo "==========================================================================
 START: Creating SourceCred Cred Update Pull Request!";
-main;
+main "$@"
 echo "==========================================================================
 END: Finished";
