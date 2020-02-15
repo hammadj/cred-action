@@ -6,21 +6,21 @@ set -o pipefail
 # and customizes the entrypoint based on what the user has provided.
 # We derive variables from the environment instead of command line
 
-COMMAND="/bin/bash /build_static_site.sh"
+build_cmd=( /bin/bash /build_static_site.sh )
 
 # Target is required, project has a default
 if [ -z "${SC_TARGET}" ]; then
    SC_TARGET="${GITHUB_WORKSPACE}/docs"        
 fi
-COMMAND="${COMMAND} --target ${SC_TARGET}"
-COMMAND="${COMMAND} --project ${SC_PROJECT}"
+build_cmd+=( --target "${SC_TARGET}" )
+build_cmd+=( --project "${SC_PROJECT}" )
 
 if [ ! -z "${SC_PROJECT_FILE}" ]; then
-    COMMAND="${COMMAND} --project-file ${GITHUB_WORKSPACE}/${SC_PROJECT_FILE}"
+    build_cmd+=( --project-file "${GITHUB_WORKSPACE}/${SC_PROJECT_FILE}" )
 fi
 
 if [ ! -z "${SC_WEIGHTS}" ]; then
-    COMMAND="${COMMAND} --weights ${GITHUB_WORKSPACE}/${SC_WEIGHTS}"
+    build_cmd+=( --weights "${GITHUB_WORKSPACE}/${SC_WEIGHTS}" )
 fi
 
 # Show the user where we are
@@ -32,8 +32,8 @@ ls
 # This command needs to be run relative to sourcecred respository
 # that is located at the WORKDIR /code
 rm -rf "${SC_TARGET}"
-echo "${COMMAND}"
-${COMMAND}
+printf '%s\n' "${build_cmd[*]}"
+"${build_cmd[@]}"
 
 echo "Finished initial run, present working directory is ${PWD}"
 ls
@@ -41,12 +41,13 @@ ls
 # This interacts with node sourcecred.js
 # Load it twice so we can access the scores -- it's a hack, pending real instance system
 # Note from @vsoch: these variable names aren't consistent - the project here referes to the project file.
-LOAD_COMMAND="node /code/bin/sourcecred.js load --project ${GITHUB_WORKSPACE}/${SC_PROJECT_FILE}"
+load_cmd=( node /code/bin/sourcecred.js load \
+    --project "${GITHUB_WORKSPACE}/${SC_PROJECT_FILE}" )
 if [ ! -z "${SC_WEIGHTS}" ]; then
-    LOAD_COMMAND="${LOAD_COMMAND} --weights ${GITHUB_WORKSPACE}/${SC_WEIGHTS}"
+    load_cmd+=( --weights "${GITHUB_WORKSPACE}/${SC_WEIGHTS}" )
 fi
-echo "$LOAD_COMMAND"
-${LOAD_COMMAND}
+printf '%s\n' "${load_cmd[*]}"
+"${load_cmd[@]}"
 node /code/bin/sourcecred.js scores "${SC_PROJECT}" | python3 -m json.tool > "${GITHUB_WORKSPACE}/${SC_SCORES_JSON}"
 
 # Now we want to interact with the GitHub repository
@@ -71,7 +72,7 @@ fi
 
 export UPDATE_BRANCH
 echo "Branch to update is ${UPDATE_BRANCH}"
-git checkout -b ${UPDATE_BRANCH}
+git checkout -b "${UPDATE_BRANCH}"
 git branch
 
 if [ "${SC_AUTOMATED}" == "true" ]; then

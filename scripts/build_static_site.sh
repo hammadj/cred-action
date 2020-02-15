@@ -104,24 +104,18 @@ build() {
     export SOURCECRED_DIRECTORY="${sourcecred_data}"
 
     if [ "${#projects[@]}" -ne 0 ]; then
-        local weightsStr=""
-        if [ -n "${weights}" ]; then
-            weightsStr="--weights ${weights}"
-        fi
         for project in "${projects[@]}"; do
             NODE_PATH="/code/node_modules${NODE_PATH:+:${NODE_PATH}}" \
-                node /code/bin/sourcecred.js load "${project}" $weightsStr
+                node /code/bin/sourcecred.js load "${project}" \
+                ${weights:+--weights "${weights}"}
         done
     fi
 
     if [ "${#project_files[@]}" -ne 0 ]; then
-        local weightsStr=""
-        if [ -n "${weights}" ]; then
-            weightsStr="--weights ${weights}"
-        fi
         for project_file in "${project_files[@]}"; do
             NODE_PATH="/code/node_modules${NODE_PATH:+:${NODE_PATH}}" \
-                node /code/bin/sourcecred.js load --project "${project_file}" $weightsStr
+                node /code/bin/sourcecred.js load --project "${project_file}" \
+                ${weights:+--weights "${weights}"}
         done
     fi
 

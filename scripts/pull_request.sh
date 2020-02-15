@@ -17,7 +17,7 @@ HEADER="${HEADER}; application/vnd.github.antiope-preview+json; application/vnd.
 
 # URLs
 REPO_URL="${BASE}/repos/${GITHUB_REPOSITORY}"
-PULLS_URL=$REPO_URL/pulls
+PULLS_URL="${REPO_URL}/pulls"
 
 ################################################################################
 # Helper Functions
@@ -53,7 +53,7 @@ create_pull_request() {
     fi
     BODY='This is a pull request to update sourcecred static files.'
     DATA="{\"base\":\"${TARGET}\", \"head\":\"${SOURCE}\", \"body\":\"${BODY}\"}"
-    RESPONSE=$(curl -sSL -H "${AUTH_HEADER}" -H "${HEADER}" --user "${GITHUB_ACTOR}" -X GET --data "${DATA}" ${PULLS_URL})
+    RESPONSE=$(curl -sSL -H "${AUTH_HEADER}" -H "${HEADER}" --user "${GITHUB_ACTOR}" -X GET --data "${DATA}" "${PULLS_URL}")
     PR=$(echo "${RESPONSE}" | python3 -c 'import json, sys
 data = json.load(sys.stdin);
 print(data[0]["head"]["ref"])')
@@ -67,7 +67,7 @@ print(data[0]["head"]["ref"])')
         # Post the pull request
         DATA="{\"title\":\"${TITLE}\", \"base\":\"${TARGET}\", \"head\":\"${SOURCE}\", \"body\":\"${BODY}\"}"
         echo "curl --user ${GITHUB_ACTOR} -X POST --data ${DATA} ${PULLS_URL}"
-        curl -sSL -H "${AUTH_HEADER}" -H "${HEADER}" --user "${GITHUB_ACTOR}" -X POST --data "${DATA}" ${PULLS_URL}
+        curl -sSL -H "${AUTH_HEADER}" -H "${HEADER}" --user "${GITHUB_ACTOR}" -X POST --data "${DATA}" "${PULLS_URL}"
         echo $?
     fi
 }
