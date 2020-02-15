@@ -12,7 +12,7 @@ fi
 
 # Show the user where we are
 echo "Present working directory is:"
-echo "${PWD}"
+pwd
 ls
 
 # Clean up any previous runs (deployed in docs folder)
@@ -29,7 +29,7 @@ rm -rf "${SC_TARGET}"
         ;
 )
 
-echo "Finished initial run, present working directory is ${PWD}"
+printf 'Finished initial run, present working directory is %s\n' "${PWD}"
 ls
 
 # This interacts with node sourcecred.js
@@ -50,7 +50,7 @@ cd "${GITHUB_WORKSPACE}"
 echo "Found files in workspace:"
 ls
 
-echo "GitHub Actor: ${GITHUB_ACTOR}"
+printf 'GitHub Actor: %s\n' "${GITHUB_ACTOR}"
 git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
 git branch
 git config --global user.name "github-actions"
@@ -65,7 +65,7 @@ else
 fi
 
 export UPDATE_BRANCH
-echo "Branch to update is ${UPDATE_BRANCH}"
+printf 'Branch to update is %s\n' "${UPDATE_BRANCH}"
 git checkout -b "${UPDATE_BRANCH}"
 git branch
 

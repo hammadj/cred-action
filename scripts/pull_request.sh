@@ -33,10 +33,10 @@ check_credentials() {
 check_events_json() {
 
     if [[ ! -f "${GITHUB_EVENT_PATH}" ]]; then
-        echo "Cannot find Github events file at ${GITHUB_EVENT_PATH}";
-        exit 1;
+        printf 'Cannot find Github events file at %s\n' "${GITHUB_EVENT_PATH}"
+        exit 1
     fi
-    echo "Found ${GITHUB_EVENT_PATH}";
+    printf 'Found %s\n' "${GITHUB_EVENT_PATH}"
     
 }
 
@@ -52,13 +52,13 @@ create_pull_request() {
     BODY='This pull request updates static files for SourceCred.'
     DATA="{\"base\":\"${TARGET}\", \"head\":\"${SOURCE}\", \"body\":\"${BODY}\"}"
     RESPONSE=$(curl -fsSL -K "${curl_config}" -X GET --data "${DATA}" "${PULLS_URL}")
-    PR=$(echo "${RESPONSE}" | python3 -c 'import json, sys
+    PR=$(printf '%s\n' "${RESPONSE}" | python3 -c 'import json, sys
 data = json.load(sys.stdin);
 print(data[0]["head"]["ref"])')
 
     # Option 1: The pull request is already open
     if [[ "${PR}" == "${SOURCE}" ]]; then
-        echo "Pull request from ${SOURCE} to ${TARGET} is already open!"
+        printf '%s\n' "Pull request from ${SOURCE} to ${TARGET} is already open!"
 
     # Option 2: Open a new pull request
     else
@@ -86,12 +86,12 @@ main() {
         echo "You must specify a branch to PR from."
         exit 1
     fi
-    echo "Branch for pull request is ${UPDATE_BRANCH}"
+    printf '%s\n' "Branch for pull request is ${UPDATE_BRANCH}"
 
     if [ -z "${SC_BRANCH_AGAINST}" ]; then
         SC_BRANCH_AGAINST=master
     fi
-    echo "Pull request will go against ${SC_BRANCH_AGAINST}"
+    printf '%s\n' "Pull request will go against ${SC_BRANCH_AGAINST}"
 
     # Ensure we have a GitHub token
     check_credentials
