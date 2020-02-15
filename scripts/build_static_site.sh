@@ -41,7 +41,6 @@ main() {
 parse_args() {
     target=
     weights=
-    repos=( )
     projects=( )
     project_files=( )
     while [ $# -gt 0 ]; do
