@@ -47,9 +47,9 @@ create_pull_request() {
 
     # Check if the branch already has a pull request open
     if [[ -z "${TITLE}" ]]; then
-        TITLE='Updating Sourcecred Cred'
+        TITLE='Update SourceCred cred'
     fi
-    BODY='This is a pull request to update sourcecred static files.'
+    BODY='This pull request updates static files for SourceCred.'
     DATA="{\"base\":\"${TARGET}\", \"head\":\"${SOURCE}\", \"body\":\"${BODY}\"}"
     RESPONSE=$(curl -fsSL -K "${curl_config}" -X GET --data "${DATA}" "${PULLS_URL}")
     PR=$(echo "${RESPONSE}" | python3 -c 'import json, sys
