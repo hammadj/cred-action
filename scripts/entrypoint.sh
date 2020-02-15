@@ -21,7 +21,7 @@ ls
 rm -rf "${SC_TARGET}"
 (
     set -x;
-    /bin/bash /build_static_site.sh \
+    /build_static_site.sh \
         --target "${SC_TARGET}" \
         --project "${SC_PROJECT}" \
         ${SC_PROJECT_FILE:+--project-file "${GITHUB_WORKSPACE}/${SC_PROJECT_FILE}"} \
@@ -80,5 +80,5 @@ else
     git add "${SC_SCORES_JSON}"
     git commit -m "Automated deployment to update ${SC_TARGET} static files $(date '+%Y-%m-%d')"
     git push origin "${UPDATE_BRANCH}"
-    /bin/bash -e /pull_request.sh
+    /pull_request.sh
 fi
