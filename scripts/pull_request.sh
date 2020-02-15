@@ -5,19 +5,17 @@
 set -e
 set -o pipefail
 
-################################################################################
-# Global Variables (we can't use GITHUB_ prefix)
-################################################################################
+make_curl_config() {
+    tmpdir="$(umask 077 && mktemp -d)"
+    curl_config="${tmpdir}/curl_config"
+    cat >"${curl_config}" <<EOF
+--user "${GITHUB_ACTOR}"
+-H "Authorization: token ${GITHUB_TOKEN}"
+-H "Accept: application/vnd.github.v3+json, application/vnd.github.antiope-preview+json, application/vnd.github.shadow-cat-preview+json"
+EOF
+}
 
-API_VERSION=v3
-BASE=https://api.github.com
-AUTH_HEADER="Authorization: token ${GITHUB_TOKEN}"
-HEADER="Accept: application/vnd.github.${API_VERSION}+json"
-HEADER="${HEADER}; application/vnd.github.antiope-preview+json; application/vnd.github.shadow-cat-preview+json"
-
-# URLs
-REPO_URL="${BASE}/repos/${GITHUB_REPOSITORY}"
-PULLS_URL="${REPO_URL}/pulls"
+PULLS_URL="https://api.github.com/repos/${GITHUB_REPOSITORY}/pulls"
 
 ################################################################################
 # Helper Functions
@@ -53,7 +51,7 @@ create_pull_request() {
     fi
     BODY='This is a pull request to update sourcecred static files.'
     DATA="{\"base\":\"${TARGET}\", \"head\":\"${SOURCE}\", \"body\":\"${BODY}\"}"
-    RESPONSE=$(curl -sSL -H "${AUTH_HEADER}" -H "${HEADER}" --user "${GITHUB_ACTOR}" -X GET --data "${DATA}" "${PULLS_URL}")
+    RESPONSE=$(curl -sSL -K "${curl_config}" -X GET --data "${DATA}" "${PULLS_URL}")
     PR=$(echo "${RESPONSE}" | python3 -c 'import json, sys
 data = json.load(sys.stdin);
 print(data[0]["head"]["ref"])')
@@ -66,14 +64,17 @@ print(data[0]["head"]["ref"])')
     else
         # Post the pull request
         DATA="{\"title\":\"${TITLE}\", \"base\":\"${TARGET}\", \"head\":\"${SOURCE}\", \"body\":\"${BODY}\"}"
-        echo "curl --user ${GITHUB_ACTOR} -X POST --data ${DATA} ${PULLS_URL}"
-        curl -sSL -H "${AUTH_HEADER}" -H "${HEADER}" --user "${GITHUB_ACTOR}" -X POST --data "${DATA}" "${PULLS_URL}"
+        (
+            set -x;
+            curl -sSL -K "${curl_config}" -X POST --data "${DATA}" "${PULLS_URL}"
+        )
         echo $?
     fi
 }
 
 
 main () {
+    make_curl_config
 
     # path to file that contains the POST response of the event
     # Example: https://github.com/actions/bin/tree/master/debug
