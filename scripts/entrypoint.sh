@@ -2,6 +2,9 @@
 set -eu
 set -o pipefail
 
+sourcecred_data="${GITHUB_WORKSPACE}/sourcecred_data"
+export SOURCECRED_DIRECTORY="${sourcecred_data}"
+
 # This script uses the scripts/build-static-site.sh provided in the container
 # and customizes the entrypoint based on what the user has provided.
 # We derive variables from the environment instead of command line

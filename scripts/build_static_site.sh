@@ -94,8 +94,10 @@ parse_args() {
 }
 
 build() {
-    sourcecred_data="$(mktemp -d --suffix ".sourcecred-data")"
-    export SOURCECRED_DIRECTORY="${sourcecred_data}"
+    if [ -z "${SOURCECRED_DIRECTORY}" ]; then
+        die "SOURCECRED_DIRECTORY is empty"
+    fi
+    echo "Data in: ${SOURCECRED_DIRECTORY}"
 
     # Load project files (required)
     if [ "${#project_files[@]}" -eq 0 ]; then
@@ -124,14 +126,9 @@ build() {
     # must fail.)
     mkdir "${target}/api/"
     mkdir "${target}/api/v1/"
-    # Eliminate the cache, which is only an intermediate target used to
-    # load the actual data. The development server similarly forbids
-    # access to the cache so that the dev and prod environments have the
-    # same semantics.
-    rm -rf "${sourcecred_data}/cache"
-    cp -r "${sourcecred_data}" "${target}/api/v1/data"
+    cp -r "${SOURCECRED_DIRECTORY}" "${target}/api/v1/data"
+    rm -rf "${target}/api/v1/data/cache"
 }
-
 
 die() {
     printf >&2 'fatal: %s\n' "$@"
