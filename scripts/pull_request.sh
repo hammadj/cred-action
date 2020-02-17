@@ -51,7 +51,7 @@ create_pull_request() {
     fi
     BODY='This is a pull request to update sourcecred static files.'
     DATA="{\"base\":\"${TARGET}\", \"head\":\"${SOURCE}\", \"body\":\"${BODY}\"}"
-    RESPONSE=$(curl -sSL -K "${curl_config}" -X GET --data "${DATA}" "${PULLS_URL}")
+    RESPONSE=$(curl -fsSL -K "${curl_config}" -X GET --data "${DATA}" "${PULLS_URL}")
     PR=$(echo "${RESPONSE}" | python3 -c 'import json, sys
 data = json.load(sys.stdin);
 print(data[0]["head"]["ref"])')
@@ -66,7 +66,7 @@ print(data[0]["head"]["ref"])')
         DATA="{\"title\":\"${TITLE}\", \"base\":\"${TARGET}\", \"head\":\"${SOURCE}\", \"body\":\"${BODY}\"}"
         (
             set -x;
-            curl -sSL -K "${curl_config}" -X POST --data "${DATA}" "${PULLS_URL}"
+            curl -fsSL -K "${curl_config}" -X POST --data "${DATA}" "${PULLS_URL}"
         )
         echo $?
     fi
