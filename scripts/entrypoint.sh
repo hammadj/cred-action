@@ -11,9 +11,11 @@ export SOURCECRED_DIRECTORY="${sourcecred_data}"
 
 COMMAND="/bin/bash /build_static_site.sh"
 
-echo METABOTS $GITHUB_WORKSPACE
+echo METABOTS $GITHUB_WORKSPACE $SC_PROJECT_FILE $SC_WEIGHTS
 
 ls
+
+pwd
 
 # Target is required, project has a default
 if [ -z "${SC_TARGET}" ]; then
