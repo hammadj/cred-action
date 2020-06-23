@@ -1,4 +1,4 @@
-FROM sourcecred/sourcecred:latest
+FROM metadreamer/sourcecred:stable
 # docker build -t cred-action .
 COPY ./scripts/entrypoint.sh /entrypoint.sh
 COPY ./scripts/pull_request.sh /pull_request.sh
